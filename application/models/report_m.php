@@ -1,24 +1,24 @@
 <?php
 
-class Report_m extends CI_Model {
+class Report_m extends CI_Model
+{
 
     function __construct()
     {
         // Call the Model constructor
         parent::__construct();
     }
-    
+
     function today_stats()
     {
         $date = date('Y-m-d');
-        $query = $this->db->query("CALL todays_service_count('$date')");
+        $query = $this->db->query("SELECT * FROM todays_service_count('$date')");
         $data = array();
 
-        foreach (@$query->result() as $row)
-        {
+        foreach (@$query->result() as $row) {
             $data[$row->type] = $row->amount;
         }
-        if(count($data))
+        if (count($data))
             return $data;
         return false;
     }
@@ -33,11 +33,12 @@ class Report_m extends CI_Model {
         return $data;
     }
 
-    function get_customer_freq_list() {
+    function get_customer_freq_list()
+    {
         $this->db->reconnect();
-        $query = $this->db->select("customer.* , SUM(  `room_sales_price` +  `total_service_price` ) as total_paid, COUNT(*) as checkin_count")
-                ->from("room_sales")->join("customer", "customer.customer_id = room_sales.customer_id")
-                ->group_by("customer_id")->order_by('checkin_count','DESC')->order_by('total_paid','DESC')->get();
+        $query = $this->db->select("customer.* , SUM(room_sales_price + total_service_price) as total_paid, COUNT(*) as checkin_count")
+            ->from("room_sales")->join("customer", "customer.customer_id = room_sales.customer_id")
+            ->group_by("customer.customer_id")->order_by('checkin_count', 'DESC')->order_by('total_paid', 'DESC')->get();
         $data = array();
         foreach ($query->result() as $res) {
             $data[] = $res;
@@ -45,23 +46,24 @@ class Report_m extends CI_Model {
         return $data;
     }
 
-    function get_customer_most_paid() {
-/*        $query = $this->db->select("customer.* , SUM(  `room_sales_price` +  `total_service_price` ) as total_paid")
-                ->from("room_sales")->join("customer", "customer.customer_id = room_sales.customer_id")
-                ->group_by("customer_id")->having('total_paid = MAX(total_paid)')->get();*/
+    function get_customer_most_paid()
+    {
+        /*        $query = $this->db->select("customer.* , SUM(  `room_sales_price` +  `total_service_price` ) as total_paid")
+                        ->from("room_sales")->join("customer", "customer.customer_id = room_sales.customer_id")
+                        ->group_by("customer_id")->having('total_paid = MAX(total_paid)')->get();*/
         $query = $this->db->query(
-            "SELECT * , COUNT(*) as checkin_count,  SUM(  `room_sales_price` +  `total_service_price` ) AS total_paid
+            'SELECT * , COUNT(*) as checkin_count,  SUM(room_sales_price + total_service_price) AS total_paid
             FROM room_sales
             JOIN (
                 SELECT MAX( total_paid ) AS max_paid
                 FROM (                
-                    SELECT customer_id, SUM(  `room_sales_price` +  `total_service_price` ) AS total_paid
+                    SELECT customer_id, SUM(room_sales_price + total_service_price) AS total_paid
                     FROM room_sales
-                    GROUP BY  `customer_id`
+                    GROUP BY customer_id
                 ) AS SRS
-            ) AS MRS
+            ) AS MRS ON TRUE
             LEFT JOIN customer ON customer.customer_id = room_sales.customer_id
-            GROUP BY room_sales.customer_id HAVING total_paid = max_paid"// HAVING total_paid = max_paid
+            GROUP BY room_sales.customer_id, customer.customer_id, MRS.max_paid HAVING SUM(room_sales_price + total_service_price) = max_paid'
         );
         $data = array();
         foreach ($query->result() as $res) {
@@ -70,11 +72,12 @@ class Report_m extends CI_Model {
         return $data;
     }
 
-    function get_next_week_freq() {
+    function get_next_week_freq()
+    {
         $dates = array();
         $freq_counts = array();
-        for($day = 1; $day<=7; ++$day) {
-            $date = date("Y-m-d",strtotime("+$day day"));
+        for ($day = 1; $day <= 7; ++$day) {
+            $date = date("Y-m-d", strtotime("+$day day"));
             $query = $this->db->query("SELECT COUNT(*) as count FROM reservation WHERE checkin_date <= '$date' AND checkout_date >= '$date'");
             $row = $query->row_array(0);
             $dates[] = $date;

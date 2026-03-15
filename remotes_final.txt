@@ -1,0 +1,4 @@
+﻿origin	https://github.com/LuxusEle/hotelmanagement.git (fetch)
+origin	https://github.com/LuxusEle/hotelmanagement.git (push)
+upstream	https://github.com/tugbadogan/hotelmanagement.git (fetch)
+upstream	https://github.com/tugbadogan/hotelmanagement.git (push)

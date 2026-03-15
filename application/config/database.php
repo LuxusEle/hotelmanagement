@@ -1,4 +1,5 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
@@ -48,14 +49,14 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = '';
-$db['default']['password'] = '';
-$db['default']['database'] = 'hotel';
-$db['default']['dbdriver'] = 'mysqli';
+$db['default']['hostname'] = 'db.pewiiztajtvnqjbvqray.supabase.co';
+$db['default']['username'] = 'postgres';
+$db['default']['password'] = 'YOUR_SUPABASE_PASSWORD'; // TODO: User needs to provide this
+$db['default']['database'] = 'postgres';
+$db['default']['dbdriver'] = 'postgre';
 $db['default']['dbprefix'] = '';
-$db['default']['pconnect'] = TRUE;
-$db['default']['db_debug'] = FALSE;
+$db['default']['pconnect'] = FALSE;
+$db['default']['db_debug'] = (ENVIRONMENT !== 'production');
 $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = '';
 $db['default']['char_set'] = 'utf8';
